@@ -104,14 +104,14 @@ class Tree {
   levelOrder(callback) {
     if (!this.root) return;
 
-    let array = [];
+    let result = [];
     let queue = [];
     queue.push(this.root);
     
     while (queue.length > 0) {
       let node = queue[0];
       
-      callback ? callback(node) : array.push(node.data);
+      callback ? callback(node) : result.push(node.data);
 
       if (node.left) queue.push(node.left);
       if (node.right) queue.push(node.right);
@@ -119,7 +119,40 @@ class Tree {
       queue.shift();
     }
 
-    if (!callback) return array;
+    if (!callback) return result;
+  }
+
+  inorder(callback, node = this.root, result = []) {
+    if (!node && !callback) return result;
+    if (!node) return;
+
+    this.inorder(callback, node.left, result);
+    callback ? callback(node) : result.push(node.data);
+    this.inorder(callback, node.right, result);
+
+    if (!callback) return result;
+  }
+
+  preorder(callback, node = this.root, result = []) {
+    if (!node && !callback) return result;
+    if (!node) return;
+
+    callback ? callback(node) : result.push(node.data);
+    this.preorder(callback, node.left, result);
+    this.preorder(callback, node.right, result);
+
+    if (!callback) return result;
+  }
+  
+  postorder(callback, node = this.root, result = []) {
+    if (!node && !callback) return result;
+    if (!node) return;
+
+    this.postorder(callback, node.left, result);
+    this.postorder(callback, node.right, result);
+    callback ? callback(node) : result.push(node.data);
+
+    if (!callback) return result;
   }
 }
 
@@ -136,3 +169,7 @@ console.log(tree.find(1));
 tree.prettyPrint(tree.root);
 
 console.log(tree.levelOrder());
+
+console.log(tree.inorder());
+console.log(tree.preorder());
+console.log(tree.postorder());
