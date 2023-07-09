@@ -8,24 +8,20 @@ class Node {
 
 class Tree {
   constructor(array) {
-    this.root = this.buildTree(array);
-  }
-
-  buildTree(array) {
     const sortedArray = array.sort(function (a, b) { return a - b })
       .filter(function (value, index, array) { return array.indexOf(value) === index });
-    
-    return this.sortedArrayToBST(sortedArray, 0, sortedArray.length - 1);
+
+    this.root = this.buildTree(sortedArray, 0, sortedArray.length - 1);
   }
 
-  sortedArrayToBST(array, start, end) {
+  buildTree(array, start, end) {
     if (start > end) return null;
 
     const mid = parseInt((start + end) / 2);
     const node = new Node(array[mid]);
 
-    node.left = this.sortedArrayToBST(array, start, mid - 1);
-    node.right = this.sortedArrayToBST(array, mid + 1, end);
+    node.left = this.buildTree(array, start, mid - 1);
+    node.right = this.buildTree(array, mid + 1, end);
 
     return node;
   }
@@ -45,6 +41,7 @@ class Tree {
 
   insert(value, node = this.root) {
     if (!node) return new Node(value);
+    if (node.data === value) return;
 
     if (value < node.data) {
       node.left = this.insert(value, node.left);
@@ -105,25 +102,21 @@ class Tree {
     if (!this.root) return;
 
     let result = [];
-    let queue = [];
-    queue.push(this.root);
+    let queue = [this.root];
     
     while (queue.length > 0) {
-      let node = queue[0];
+      let node = queue.shift();
       
       callback ? callback(node) : result.push(node.data);
 
       if (node.left) queue.push(node.left);
       if (node.right) queue.push(node.right);
-
-      queue.shift();
     }
 
     if (!callback) return result;
   }
 
   inorder(callback, node = this.root, result = []) {
-    if (!node && !callback) return result;
     if (!node) return;
 
     this.inorder(callback, node.left, result);
@@ -134,7 +127,6 @@ class Tree {
   }
 
   preorder(callback, node = this.root, result = []) {
-    if (!node && !callback) return result;
     if (!node) return;
 
     callback ? callback(node) : result.push(node.data);
@@ -145,7 +137,6 @@ class Tree {
   }
   
   postorder(callback, node = this.root, result = []) {
-    if (!node && !callback) return result;
     if (!node) return;
 
     this.postorder(callback, node.left, result);
@@ -158,45 +149,64 @@ class Tree {
   height(node = this.root, height = 0) {
     if (!node) return height;
 
-    height++;
     const leftHeight = this.height(node.left, height);
     const rightHeight = this.height(node.right, height);
 
-    return Math.max(leftHeight, rightHeight);
+    return Math.max(leftHeight, rightHeight) + 1;
   }
 
   depth(node, root = this.root, depth = 0) {
     if (!root) return 'Node doesn\'t exists!';
     if (root === node) return depth;
 
-    depth++;
     if (node.data < root.data) {
-      return this.depth(node, root.left, depth);  
+      return this.depth(node, root.left, depth + 1);  
     } else {
-      return this.depth(node, root.right, depth);
+      return this.depth(node, root.right, depth + 1);
     }
+  }
+
+  isBalanced(node = this.root) {
+    if (!node) return true;
+    
+    const leftHeight = this.height(node.left, 0);
+    const rightHeight = this.height(node.right, 0);
+
+    const heightDiff = Math.abs(leftHeight - rightHeight);
+    return heightDiff < 2 && this.isBalanced(node.left) && this.isBalanced(node.right);
+  }
+
+  rebalance() {
+    const array = this.levelOrder();
+    this.root = this.buildTree(array, 0, array.length - 1);
   }
 }
 
-const tree = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
-tree.prettyPrint(tree.root);
+const tree = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 24, 51, 38, 77]);
 
-tree.insert(727);
 tree.prettyPrint(tree.root);
-
-tree.delete(8);
-tree.prettyPrint(tree.root);
-
-console.log(tree.find(1));
-tree.prettyPrint(tree.root);
+console.log(tree.isBalanced());
 
 console.log(tree.levelOrder());
-
 console.log(tree.inorder());
 console.log(tree.preorder());
 console.log(tree.postorder());
 
-console.log(tree.height());
+tree.insert(727);
+tree.insert(667);
+tree.insert(1337);
+tree.insert(999);
+tree.insert(888);
 
 tree.prettyPrint(tree.root);
-console.log(tree.depth(tree.find(727)));
+console.log(tree.isBalanced());
+
+tree.rebalance();
+
+tree.prettyPrint(tree.root);
+console.log(tree.isBalanced());
+
+console.log(tree.levelOrder());
+console.log(tree.inorder());
+console.log(tree.preorder());
+console.log(tree.postorder());
