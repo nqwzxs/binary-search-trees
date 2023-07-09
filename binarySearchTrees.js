@@ -89,13 +89,50 @@ class Tree {
       return node;
     }
   }
+
+  find(value, node = this.root) {
+    if (!node) return 'Node not found!';
+    if (node.data === value) return node;
+
+    if (node.data > value) {
+      return this.find(value, node.left);  
+    } else {
+      return this.find(value, node.right);
+    }
+  }
+
+  levelOrder(callback) {
+    if (!this.root) return;
+
+    let array = [];
+    let queue = [];
+    queue.push(this.root);
+    
+    while (queue.length > 0) {
+      let node = queue[0];
+      
+      callback ? callback(node) : array.push(node.data);
+
+      if (node.left) queue.push(node.left);
+      if (node.right) queue.push(node.right);
+
+      queue.shift();
+    }
+
+    if (!callback) return array;
+  }
 }
 
 const tree = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
 tree.prettyPrint(tree.root);
-tree.insert(2);
-tree.prettyPrint(tree.root);
+
 tree.insert(727);
 tree.prettyPrint(tree.root);
+
 tree.delete(8);
 tree.prettyPrint(tree.root);
+
+console.log(tree.find(1));
+tree.prettyPrint(tree.root);
+
+console.log(tree.levelOrder());
