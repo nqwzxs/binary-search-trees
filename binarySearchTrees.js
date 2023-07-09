@@ -154,6 +154,28 @@ class Tree {
 
     if (!callback) return result;
   }
+
+  height(node = this.root, height = 0) {
+    if (!node) return height;
+
+    height++;
+    const leftHeight = this.height(node.left, height);
+    const rightHeight = this.height(node.right, height);
+
+    return Math.max(leftHeight, rightHeight);
+  }
+
+  depth(node, root = this.root, depth = 0) {
+    if (!root) return 'Node doesn\'t exists!';
+    if (root === node) return depth;
+
+    depth++;
+    if (node.data < root.data) {
+      return this.depth(node, root.left, depth);  
+    } else {
+      return this.depth(node, root.right, depth);
+    }
+  }
 }
 
 const tree = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
@@ -173,3 +195,8 @@ console.log(tree.levelOrder());
 console.log(tree.inorder());
 console.log(tree.preorder());
 console.log(tree.postorder());
+
+console.log(tree.height());
+
+tree.prettyPrint(tree.root);
+console.log(tree.depth(tree.find(727)));
