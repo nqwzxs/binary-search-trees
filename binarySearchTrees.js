@@ -42,7 +42,60 @@ class Tree {
       this.prettyPrint(node.left, `${prefix}${isLeft ? '    ' : '│   '}`, true);
     }
   }
+
+  insert(value, node = this.root) {
+    if (!node) return new Node(value);
+
+    if (value < node.data) {
+      node.left = this.insert(value, node.left);
+    } else if (value > node.data) {
+      node.right = this.insert(value, node.right);
+    }
+
+    return node;
+  }
+
+  delete(value, node = this.root) {
+    if (!node) return node;
+
+    if (value < node.data) {
+      node.left = this.delete(value, node.left);
+      return node;
+    } else if (value > node.data) {
+      node.right = this.delete(value, node.right);
+      return node;
+    }
+
+    if (!node.left) {
+      return node.right;
+    } else if (!node.right) {
+      return node.left;
+    } else {
+      let succParent = node;
+      let succ = node.right;
+
+      while (succ.left) {
+        succParent = succ;
+        succ = succ.left;
+      }
+
+      if (succParent !== node) {
+        succParent.left = succ.right;
+      } else {
+        succParent.right = succ.right;
+      }
+
+      node.data = succ.data;
+      return node;
+    }
+  }
 }
 
 const tree = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
+tree.prettyPrint(tree.root);
+tree.insert(2);
+tree.prettyPrint(tree.root);
+tree.insert(727);
+tree.prettyPrint(tree.root);
+tree.delete(8);
 tree.prettyPrint(tree.root);
